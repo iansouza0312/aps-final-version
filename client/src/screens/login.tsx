@@ -16,7 +16,6 @@ import { useNavigate } from "react-router-dom";
 
 export function Login() {
   const [file, setFile] = useState<File | null>(null);
-  const [message, setMessage] = useState<string>("");
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -28,13 +27,56 @@ export function Login() {
   };
 
   // Funcao para envio de formulario ao backend
+  // const handleSubmit = async (event: React.FormEvent) => {
+  //   event.preventDefault();
+
+  //   if (!file) {
+  //     toast({
+  //       title: "Selecione uma imagem",
+  //       description: "selecione uma imagem para acessar o sistema.",
+  //       variant: "destructive",
+  //     });
+  //     return;
+  //   }
+
+  //   const formData = new FormData();
+  //   formData.append("file", file);
+
+  //   try {
+  //     const response = await axios.post(
+  //       "http://localhost:5000/upload",
+  //       formData,
+  //       {
+  //         headers: {
+  //           "Content-Type": "multipart/form-data",
+  //         },
+  //       }
+  //     );
+  //     toast({
+  //       title: "Imagem enviada com sucesso",
+  //       description: "Aguarde um momento para realizar seu login",
+  //       variant: "success",
+  //     });
+  //     navigate("/dashboard");
+  //     setMessage(response.data.message);
+  //   } catch (error) {
+  //     console.error("Error uploading file:", error);
+  //     toast({
+  //       title: "Erro no envio da imagem",
+  //       description:
+  //         "Ocorreu um erro no envio da imagem, por favor tente novamente",
+  //       variant: "destructive",
+  //     });
+  //   }
+  // };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (!file) {
       toast({
         title: "Selecione uma imagem",
-        description: "selecione uma imagem para acessar o sistema.",
+        description: "Selecione uma imagem para acessar o sistema.",
         variant: "destructive",
       });
       return;
@@ -45,7 +87,7 @@ export function Login() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/upload",
+        "http://localhost:5000/identify",
         formData,
         {
           headers: {
@@ -53,19 +95,36 @@ export function Login() {
           },
         }
       );
+
+      const { access_level } = response.data;
+
+      // Show success toast
       toast({
         title: "Imagem enviada com sucesso",
-        description: "Aguarde um momento para realizar seu login",
+        description: "Aguarde um momento para realizar seu login.",
         variant: "success",
       });
-      navigate("/dashboard");
-      setMessage(response.data.message);
+
+      // Redirect based on access level
+      if (access_level === 3) {
+        navigate("/dashboard");
+      } else if (access_level === 2) {
+        navigate("/admin");
+      } else if (access_level === 1) {
+        navigate("/public");
+      } else {
+        toast({
+          title: "Nível de acesso não reconhecido",
+          description: "Nenhum nível de acesso correspondente encontrado.",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.error("Error identifying user:", error);
       toast({
         title: "Erro no envio da imagem",
         description:
-          "Ocorreu um erro no envio da imagem, por favor tente novamente",
+          "Ocorreu um erro no envio da imagem, por favor tente novamente.",
         variant: "destructive",
       });
     }
