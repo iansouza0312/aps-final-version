@@ -7,9 +7,21 @@
 - node_modules
 - package.json
 
-### run the following command :
+### run the following commands :
 
-#### npm start
+##### 1 - cd client/
+
+##### 2 - npm install
+
+##### 3 - cd ..
+
+##### 4 - cd server/
+
+##### 5 - pip install
+
+#### 6 - cd ..
+
+#### 7 - npm start
 
 server - http://localhost:5000
 
